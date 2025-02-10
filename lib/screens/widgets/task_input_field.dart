@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../domain/project.dart';
-// Model danych zadania:
-
 
 class TaskInputField extends StatefulWidget {
   final Function(Task) onTaskAdded;
-  final DateTime? projectStartDate; // minimalna data
-  final DateTime? projectEndDate;   // maksymalna data
+  final DateTime? projectStartDate;
+  final DateTime? projectEndDate;
 
   const TaskInputField({
     Key? key,
@@ -21,14 +19,11 @@ class TaskInputField extends StatefulWidget {
 }
 
 class _TaskInputFieldState extends State<TaskInputField> {
-  // Kontrolery pól tekstowych
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   
-  // Data wybrana w kalendarzu
   DateTime? _selectedDueDate;
 
-  // Pomocniczy format daty (np. dd.MM.yyyy)
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
 
   @override
@@ -38,9 +33,8 @@ class _TaskInputFieldState extends State<TaskInputField> {
     super.dispose();
   }
 
-  // Funkcja do dodawania zadania
+
   void _addTask() {
-    // Walidacja podstawowa – czy nazwa i data są wypełnione
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Wpisz nazwę zadania.')),
@@ -54,17 +48,14 @@ class _TaskInputFieldState extends State<TaskInputField> {
       return;
     }
 
-    // Utworzenie obiektu Task
     final task = Task(
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       dueDate: _selectedDueDate!,
     );
 
-    // Wywołanie callbacku przekazanego z rodzica
     widget.onTaskAdded(task);
 
-    // Wyczyść pola po dodaniu
     _titleController.clear();
     _descriptionController.clear();
     setState(() {
@@ -72,14 +63,13 @@ class _TaskInputFieldState extends State<TaskInputField> {
     });
   }
 
-  // Funkcja pokazująca kalendarz do wyboru daty
   Future<void> _pickDueDate() async {
     final now = DateTime.now();
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDueDate ?? widget.projectStartDate ?? now,
-      firstDate: widget.projectStartDate ?? DateTime(now.year - 1), // fallback
-      lastDate: widget.projectEndDate ?? DateTime(now.year + 1),    // fallback
+      firstDate: widget.projectStartDate ?? DateTime(now.year - 1),
+      lastDate: widget.projectEndDate ?? DateTime(now.year + 1),
     );
     if (pickedDate != null) {
       setState(() {
@@ -92,7 +82,7 @@ class _TaskInputFieldState extends State<TaskInputField> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Pole: Nazwa zadania
+      // Pole: Nazwa zadania
         TextField(
           controller: _titleController,
           decoration: const InputDecoration(
@@ -135,8 +125,7 @@ class _TaskInputFieldState extends State<TaskInputField> {
           ),
         ),
         const SizedBox(height: 8),
-
-        // Przycisk „Dodaj”
+        
         Align(
           alignment: Alignment.centerRight,
           child: ElevatedButton.icon(

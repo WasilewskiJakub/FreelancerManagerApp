@@ -51,7 +51,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     await _userService.updateUser(updatedUser);
 
     if (_imageFile != null) {
-      // 🚀 Możesz dodać zapis zdjęcia do Firebase Storage i aktualizację URL
+      // Tutaj mozna dodać obsługe do zapisywania zdjec w Firestore (usluga platna)!
     }
 
     Navigator.pushReplacement(
@@ -156,7 +156,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: TextFormField(
         initialValue: initialValue,
         decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
-        validator: (value) => null, // 🔥 Brak walidacji pustych pól
+        validator: (value) => null,
         onChanged: onChanged,
         keyboardType: keyboardType,
       ),

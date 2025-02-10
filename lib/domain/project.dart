@@ -15,25 +15,25 @@ class Task {
     this.manDay = 0,
   });
 
-  /// 🔹 Konwersja do mapy dla Firestore
+  // Konwersja do mapy dla Firestore
   Map<String, dynamic> toMap() {
     return {
       'title': title,
       'description': description,
       'dueDate': Timestamp.fromDate(dueDate),
       'isCompleted': isCompleted,
-      'manDay': manDay, // 🔹 Poprawiona literówka (było 'madDay')
+      'manDay': manDay, 
     };
   }
 
-  /// 🔹 Tworzenie obiektu `Task` na podstawie mapy Firestore
+  // Tworzenie obiektu `Task` na podstawie mapy Firestore
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       dueDate: (map['dueDate'] as Timestamp).toDate(),
-      isCompleted: map['isCompleted'] ?? false, // 🔹 Bezpieczna obsługa null
-      manDay: map['manDay'] ?? 0, // 🔹 Bezpieczna obsługa null
+      isCompleted: map['isCompleted'] ?? false,
+      manDay: map['manDay'] ?? 0,
     );
   }
 }
@@ -61,21 +61,21 @@ class Project {
     required this.tasks,
   });
 
-  /// 🔹 Konwersja `Project` do mapy Firestore
+  // Konwersja `Project` do mapy Firestore
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
       'name': name,
       'description': description,
-      'startDate': startDate != null ? Timestamp.fromDate(startDate!) : null, // 🔹 Obsługa null
-      'endDate': endDate != null ? Timestamp.fromDate(endDate!) : null, // 🔹 Obsługa null
-      'createdAt': createdAt == null ? FieldValue.serverTimestamp() : Timestamp.fromDate(createdAt!), // 🔹 Obsługa null
+      'startDate': startDate != null ? Timestamp.fromDate(startDate!) : null,
+      'endDate': endDate != null ? Timestamp.fromDate(endDate!) : null,
+      'createdAt': createdAt == null ? FieldValue.serverTimestamp() : Timestamp.fromDate(createdAt!),
       'priority': priority,
       'tasks': tasks.map((task) => task.toMap()).toList(),
     };
   }
 
-  /// 🔹 Tworzenie obiektu `Project` na podstawie dokumentu Firestore
+  // Tworzenie obiektu `Project` na podstawie dokumentu Firestore
   factory Project.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 

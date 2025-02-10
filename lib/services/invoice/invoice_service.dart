@@ -17,7 +17,6 @@ class InvoiceDatabase {
   }
 
   Future<Database> get database async {
-    // Zwraca już zainicjowaną bazę lub czeka na inicjalizację
     if (_database != null) return _database!;
     _database = await _initDB();
     return _database!;
@@ -91,7 +90,7 @@ class InvoiceDatabase {
 
   Future<void> _emitInvoiceValueForUser(String userId) async {
     final total = await getTotalInvoiceValueForUser(userId);
-    _invoiceValueController.add(total); // emitujemy do streamu
+    _invoiceValueController.add(total);
   }
 
   Future<double> getTotalInvoiceValueForUser(String userId) async {
@@ -108,7 +107,6 @@ class InvoiceDatabase {
     );
   }
 
-  /// Gdy pobierasz PDF:
   Future<Uint8List?> getInvoicePdf(int invoiceId) async {
     final db = await database;
     final List<Map<String, dynamic>> results = await db.query(

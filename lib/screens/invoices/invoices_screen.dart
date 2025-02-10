@@ -84,13 +84,12 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         ],
                       ),
                     ),
-                    // Podgląd PDF w kafelku
                     if (invoice['pdfData'] != null)
                       SizedBox(
-                        height: 200, // Wysokość podglądu
+                        height: 200,
                         child: PdfPreview(
                           build: (format) async => invoice['pdfData'] as Uint8List,
-                          useActions: false, // Ukrywa dodatkowe przyciski
+                          useActions: false,
                         ),
                       ),
                   ],

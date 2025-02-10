@@ -44,10 +44,7 @@ class _AddProjectScreenState extends State<AddProjectScreen>
     if (!_formKey.currentState!.validate()) {
       return false;
     }
-
-    // 2. Dodatkowa logika walidacji poszczególnych kroków
     if (_currentStep == 1) {
-      // Sprawdź czy daty są ustawione
       if (_startDate == null || _endDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -57,18 +54,12 @@ class _AddProjectScreenState extends State<AddProjectScreen>
         return false;
       }
     }
-
     return true;
   }
 
   void _nextStep() {
-    // Jeśli obecny krok nie został poprawnie wypełniony – nie przechodzimy dalej
     if (!_validateStep()) return;
-
-    // Zapisz wartości z formularza (wywołuje onSaved() wewnątrz pól)
     _formKey.currentState!.save();
-
-    // Przejście do kolejnego kroku
     if (_currentStep < 3) {
       setState(() => _currentStep++);
       _pageController.nextPage(
@@ -76,7 +67,6 @@ class _AddProjectScreenState extends State<AddProjectScreen>
         curve: Curves.easeInOut,
       );
     } else {
-      // Gdy jesteśmy na ostatnim kroku (step == 3) – zapisujemy projekt
       _saveProjectToFirebase();
     }
   }
@@ -155,14 +145,13 @@ class _AddProjectScreenState extends State<AddProjectScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: LinearProgressIndicator(
-        value: (_currentStep + 1) / 4, // 4 kroki
+        value: (_currentStep + 1) / 4,
         backgroundColor: Colors.grey[300],
         color: const Color.fromARGB(255, 68, 20, 100),
       ),
     );
   }
 
-  // Krok 1: Nazwa i opis
   Widget _step1() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -197,41 +186,50 @@ class _AddProjectScreenState extends State<AddProjectScreen>
     );
   }
 
-  // Krok 2: Daty
   Widget _step2() {
-    final DateFormat dateFormat = DateFormat('dd.MM.yyyy'); // wybierz format, jaki Ci odpowiada
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Krok 2: Daty projektu",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            // Pole do wyboru daty rozpoczęcia
-            _buildDatePickerField(
-              label: 'Data rozpoczęcia',
-              selectedDate: _startDate,
-              onDatePicked: (picked) => setState(() => _startDate = picked),
-              dateFormat: dateFormat,
-            ),
-            const SizedBox(height: 16),
-            // Pole do wyboru daty zakończenia
-            _buildDatePickerField(
-              label: 'Data zakończenia',
-              selectedDate: _endDate,
-              onDatePicked: (picked) => setState(() => _endDate = picked),
-              dateFormat: dateFormat,
-            ),
-          ],
-        ),
+  final DateFormat dateFormat = DateFormat('dd.MM.yyyy');
+
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Krok 2: Daty projektu",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+
+          _buildDatePickerField(
+            label: 'Data rozpoczęcia',
+            selectedDate: _startDate,
+            onDatePicked: (picked) {
+              setState(() {
+                _startDate = picked;
+                _endDate = null;
+              });
+            },
+            dateFormat: dateFormat,
+          ),
+          const SizedBox(height: 16),
+
+          _buildDatePickerField(
+            label: 'Data zakończenia',
+            selectedDate: _endDate,
+            onDatePicked: (picked) => setState(() => _endDate = picked),
+            dateFormat: dateFormat,
+            enabled: _startDate != null,
+            firstDate: _startDate,
+          ),
+        ],
       ),
-    );
-  }
-  // Krok 3: Priorytet
+    ),
+  );
+}
+
+
+
   Widget _step3() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -268,10 +266,9 @@ class _AddProjectScreenState extends State<AddProjectScreen>
       child: SingleChildScrollView(
         child: Column(
           children: [
-            // Przykładowe przekazanie widełek projektu:
             TaskInputField(
-              projectStartDate: _startDate, // data startu zdefiniowana w tym samym StatefulWidget
-              projectEndDate: _endDate,     // data końca
+              projectStartDate: _startDate,
+              projectEndDate: _endDate,
               onTaskAdded: (task) {
                 setState(() {
                   _tasks.add(task);
@@ -280,8 +277,6 @@ class _AddProjectScreenState extends State<AddProjectScreen>
               },
             ),
             const SizedBox(height: 10),
-
-            // Lista wszystkich dodanych zadań
             Column(
               children: _tasks.map((task) {
                 return ListTile(
@@ -327,14 +322,18 @@ class _AddProjectScreenState extends State<AddProjectScreen>
       ),
     );
   }
+
   Widget _buildDatePickerField({
     required String label,
     required DateTime? selectedDate,
     required Function(DateTime) onDatePicked,
     required DateFormat dateFormat,
+    bool enabled = true,
+    DateTime? firstDate,
   }) {
     return TextFormField(
-      readOnly: true, // pole ma być tylko do odczytu
+      readOnly: true,
+      enabled: enabled,
       decoration: InputDecoration(
         labelText: label,
         suffixIcon: const Icon(Icons.calendar_today),
@@ -342,18 +341,20 @@ class _AddProjectScreenState extends State<AddProjectScreen>
       controller: TextEditingController(
         text: selectedDate == null ? '' : dateFormat.format(selectedDate),
       ),
-      onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
-        final DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: selectedDate ?? DateTime.now(),
-          firstDate: DateTime(2020),
-          lastDate: DateTime(2030),
-        );
-        if (picked != null) {
-          onDatePicked(picked);
-        }
-      },
+      onTap: enabled
+          ? () async {
+              FocusScope.of(context).requestFocus(FocusNode());
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: selectedDate ?? (firstDate ?? DateTime.now()),
+                firstDate: firstDate ?? DateTime(2020),
+                lastDate: DateTime(2030),
+              );
+              if (picked != null) {
+                onDatePicked(picked);
+              }
+            }
+          : null,
       validator: (value) {
         if ((selectedDate == null || value == null || value.isEmpty) && label.contains('rozpoczęcia')) {
           return 'Wybierz datę rozpoczęcia';
@@ -361,11 +362,13 @@ class _AddProjectScreenState extends State<AddProjectScreen>
         if ((selectedDate == null || value == null || value.isEmpty) && label.contains('zakończenia')) {
           return 'Wybierz datę zakończenia';
         }
+        if (label.contains('zakończenia') && firstDate != null && selectedDate != null && selectedDate.isBefore(firstDate)) {
+          return 'Data zakończenia nie może być wcześniejsza niż data rozpoczęcia';
+        }
         return null;
-      },
-      onSaved: (_) {
       },
     );
   }
+
 
 }

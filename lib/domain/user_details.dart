@@ -21,7 +21,7 @@ class UserDetails {
     this.profileImage,
   });
 
-  /// 🔹 Konwersja `UserDetails` do mapy Firestore
+  // Konwersja `UserDetails` do mapy Firestore
   Map<String, dynamic> toMap() {
     return {
       'firstName': firstName,
@@ -34,7 +34,7 @@ class UserDetails {
     };
   }
 
-  /// 🔹 Tworzenie obiektu `UserDetails` na podstawie dokumentu Firestore
+  // Tworzenie obiektu `UserDetails` na podstawie dokumentu Firestore
   factory UserDetails.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
@@ -50,7 +50,6 @@ class UserDetails {
     );
   }
 
-  /// 🔹 Metoda `copyWith` do aktualizacji obiektu
   UserDetails copyWith({
     String? id,
     String? firstName,

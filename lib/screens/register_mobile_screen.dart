@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freelancer_manager_app/services/auth/auth_service.dart';
-import 'package:freelancer_manager_app/screens/login_mobile_screen.dart'; // Ekran logowania
+import 'package:freelancer_manager_app/screens/login_mobile_screen.dart';
 
 class RegisterMobileScreen extends StatefulWidget {
   const RegisterMobileScreen({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class _RegisterMobileScreenState extends State<RegisterMobileScreen> {
   final _formKey = GlobalKey<FormState>();
 
   bool _obscurePassword = true;
-  bool isLoading = false; // Zmienna do kontrolowania loading state
+  bool isLoading = false;
 
   String firstName = '';
   String lastName = '';
@@ -24,7 +24,7 @@ class _RegisterMobileScreenState extends State<RegisterMobileScreen> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isLoading = true; // Pokazujemy loader
+        isLoading = true;
       });
 
       final user = await _authService.registerUser(
@@ -43,7 +43,6 @@ class _RegisterMobileScreenState extends State<RegisterMobileScreen> {
           const SnackBar(content: Text('Zarejestrowano pomyślnie!')),
         );
 
-        // Przenosimy na stronę logowania po 1.5 sekundy
         Future.delayed(const Duration(seconds: 1), () {
           Navigator.pushReplacement(
             context,
@@ -156,7 +155,7 @@ class _RegisterMobileScreenState extends State<RegisterMobileScreen> {
                     ),
                     const SizedBox(height: 20),
                     isLoading
-                        ? const CircularProgressIndicator() // Pokazujemy loading
+                        ? const CircularProgressIndicator()
                         : ElevatedButton(
                             onPressed: _register,
                             style: ElevatedButton.styleFrom(

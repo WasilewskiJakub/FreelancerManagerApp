@@ -73,6 +73,7 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
                       clientNIPController.text,
                       double.tryParse(hourlyRateController.text) ?? 100.0,
                     );
+                    Navigator.pop(context);
                   }
                 },
                 child: const Text("Generuj fakturę"),
@@ -86,62 +87,6 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
 }
 
 class InvoiceGenerator {
-  // static Future<void> generateInvoice(
-  //     BuildContext context,
-  //     Project project,
-  //     UserDetails userDetails,
-  //     String clientName,
-  //     String clientAddress,
-  //     String clientCity,
-  //     String clientNIP,
-  //     double hourlyRate) async {
-  //   final pdf = pw.Document();
-  //   final DateTime invoiceDate = DateTime.now();
-  //   final String invoiceNumber = "FV-${invoiceDate.year}${invoiceDate.month}${invoiceDate.day}-${project.id}";
-
-  //   List<InvoiceItem> invoiceItems = project.tasks
-  //       .where((task) => task.isCompleted)
-  //       .map((task) => InvoiceItem(title: task.title, manDays: task.manDay))
-  //       .toList();
-
-  //   pdf.addPage(
-  //     pw.Page(
-  //       pageFormat: PdfPageFormat.a4,
-  //       build: (pw.Context context) {
-  //         return pw.Column(
-  //           crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //           children: [
-  //             _buildHeader(invoiceNumber, invoiceDate),
-  //             _buildUserDetails(userDetails),
-  //             _buildClientDetails(clientName, clientAddress, clientCity, clientNIP),
-  //             _buildProjectDetails(project),
-  //             _buildInvoiceTable(invoiceItems, hourlyRate),
-  //             _buildTotalAmount(invoiceItems, hourlyRate),
-  //             pw.SizedBox(height: 20),
-  //             pw.Text("Dziękujemy za współpracę!",
-  //                 style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-  //           ],
-  //         );
-  //       },
-  //     ),
-  //   );
-
-  //   double totalAmount = invoiceItems.fold(0, (sum, item) => sum + (item.manDays * 8 * hourlyRate));
-  //   totalAmount *= 1.23;
-
-  //   await InvoiceDatabase().saveInvoice(
-  //   clientName: clientName,
-  //   clientAddress: clientAddress,
-  //   clientCity: clientCity,
-  //   clientNIP: clientNIP,
-  //   projectId: project.id!,
-  //   totalAmount: totalAmount,
-  //   pdfData: await pdf.save(), // Zapisuje PDF jako bajty
-  // );
-
-  //   await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
-  // }
-
   static pw.Widget _buildTotalAmount(List<InvoiceItem> items, double hourlyRate) {
     double totalAmount = items.fold(0, (sum, item) => sum + (item.manDays * 8 * hourlyRate));
     return pw.Column(
@@ -201,70 +146,69 @@ class InvoiceGenerator {
     String clientCity,
     String clientNIP,
     double hourlyRate) async {
-  try {
-    final pdf = pw.Document();
-    final DateTime invoiceDate = DateTime.now();
-    final String invoiceNumber = "FV-${invoiceDate.year}${invoiceDate.month}${invoiceDate.day}-${project.id}";
+    try {
+      final pdf = pw.Document();
+      final DateTime invoiceDate = DateTime.now();
+      final String invoiceNumber = "FV-${invoiceDate.year}${invoiceDate.month}${invoiceDate.day}-${project.id}";
 
-    List<InvoiceItem> invoiceItems = project.tasks
-        .where((task) => task.isCompleted)
-        .map((task) => InvoiceItem(title: task.title, manDays: task.manDay))
-        .toList();
+      List<InvoiceItem> invoiceItems = project.tasks
+          .where((task) => task.isCompleted)
+          .map((task) => InvoiceItem(title: task.title, manDays: task.manDay))
+          .toList();
 
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              _buildHeader(invoiceNumber, invoiceDate),
-              _buildUserDetails(userDetails),
-              _buildClientDetails(clientName, clientAddress, clientCity, clientNIP),
-              _buildProjectDetails(project),
-              _buildInvoiceTable(invoiceItems, hourlyRate),
-              _buildTotalAmount(invoiceItems, hourlyRate),
-              pw.SizedBox(height: 20),
-              pw.Text("Dziękujemy za współpracę!",
-                  style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-            ],
-          );
-        },
-      ),
-    );
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                _buildHeader(invoiceNumber, invoiceDate),
+                _buildUserDetails(userDetails),
+                _buildClientDetails(clientName, clientAddress, clientCity, clientNIP),
+                _buildProjectDetails(project),
+                _buildInvoiceTable(invoiceItems, hourlyRate),
+                _buildTotalAmount(invoiceItems, hourlyRate),
+                pw.SizedBox(height: 20),
+                pw.Text("Dziękujemy za współpracę!",
+                    style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+              ],
+            );
+          },
+        ),
+      );
 
-    double totalAmount = invoiceItems.fold(0, (sum, item) => sum + (item.manDays * 8 * hourlyRate));
+      double totalAmount = invoiceItems.fold(0, (sum, item) => sum + (item.manDays * 8 * hourlyRate));
 
-    UserService userService = UserService();
-    UserDetails user = (await userService.getCurrentUserDetails())!;
+      UserService userService = UserService();
+      UserDetails user = (await userService.getCurrentUserDetails())!;
 
-    await InvoiceDatabase().saveInvoice(
-      userId: user.id!,
-      clientName: clientName,
-      clientAddress: clientAddress,
-      clientCity: clientCity,
-      clientNIP: clientNIP,
-      projectId: project.id!,
-      hourlyRate: hourlyRate,
-      totalNetAmount: totalAmount,
-      pdfData: await pdf.save(),
-    );
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
-    });
+      await InvoiceDatabase().saveInvoice(
+        userId: user.id!,
+        clientName: clientName,
+        clientAddress: clientAddress,
+        clientCity: clientCity,
+        clientNIP: clientNIP,
+        projectId: project.id!,
+        hourlyRate: hourlyRate,
+        totalNetAmount: totalAmount,
+        pdfData: await pdf.save(),
+      );
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Faktura została wygenerowana i zapisana")),
-    );
-  } catch (e) {
-    debugPrint("Błąd podczas generowania faktury: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Błąd podczas generowania faktury")),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Faktura została wygenerowana i zapisana")),
+      );
+    } catch (e) {
+      debugPrint("Błąd podczas generowania faktury: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Błąd podczas generowania faktury")),
+      );
+    }
   }
-}
-
 
   static pw.Widget _buildProjectDetails(Project project) {
     return pw.Column(

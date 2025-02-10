@@ -17,7 +17,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
   String? _userId;
 
-  // Staty z Firestore
   int _userProjects = 0;
   int _userTasks = 0;
   double _avgTasksPerProject = 0.0;
@@ -62,7 +61,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
                 for (var doc in docs) {
                   final data = doc.data() as Map<String, dynamic>;
-                  // liczymy taski
+
                   if (data['tasks'] != null && data['tasks'] is List) {
                     totalTasks += (data['tasks'] as List).length;
                   }
@@ -79,7 +78,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                   final data = doc.data() as Map<String, dynamic>;
                   
                   if (data['priority'] != null) {
-                    String priority = data['priority']; // np. "Niski", "Średni", "Wysoki"
+                    String priority = data['priority'];
                     if (priorityCounts.containsKey(priority)) {
                       priorityCounts[priority] = (priorityCounts[priority] ?? 0) + 1;
                     }
@@ -142,7 +141,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             BarChartRodData(
               toY: value.toDouble(),
               color: Colors.deepPurple,
-              width: 16, // Grubość słupka
+              width: 16,
               borderRadius: BorderRadius.circular(4),
             ),
           ],

@@ -37,28 +37,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar
       appBar: _buildAppBar(),
-
-      // Drawer (otwierany z prawej strony)
       endDrawer: _buildDrawer(context),
-
-      // Treść ekranu = IndexedStack, by utrzymać stan między zakładkami
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,
       ),
 
-      // Dolna nawigacja
       bottomNavigationBar: _buildBottomNavBar(),
 
-      // Pływający przycisk + tylko w zakładce 0 (Projekty)
       floatingActionButton: _selectedIndex == 0 ? _buildFAB() : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  /// AppBar z tytułem zależnym od aktywnej zakładki
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: const Color.fromARGB(255, 68, 20, 100),
@@ -80,7 +72,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// Drawer (Menu) z prawej strony
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: ListView(
@@ -114,7 +105,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// Przycisk plus do dodawania nowego projektu (tylko w zakładce "Projekty")
   Widget _buildFAB() {
     return FloatingActionButton(
       onPressed: () {
@@ -132,7 +122,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// Dolny pasek nawigacji z 4 zakładkami
   Widget _buildBottomNavBar() {
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
@@ -150,7 +139,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  /// Pojedynczy przycisk w bottom nav
   Widget _buildNavItem(IconData icon, String label, int index) {
     final bool isActive = _selectedIndex == index;
     final Color activeColor = const Color.fromARGB(255, 68, 20, 100);

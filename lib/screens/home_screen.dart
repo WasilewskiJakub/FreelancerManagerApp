@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'login_mobile_screen.dart';
 import 'register_mobile_screen.dart';
-import 'wave_cliper.dart'; // import klasy WaveClipper
 import '../services/auth/auth_service.dart';
 import 'homepage_dashboard/dashboard_mobile_screen.dart';
 class HomeScreen extends StatelessWidget {
@@ -11,7 +10,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Responsywność w zależności od szerokości ekranu:
     return LayoutBuilder(
       builder: (ctx, constraints) {
         if(kIsWeb || (Platform.isWindows || Platform.isLinux || Platform.isMacOS)){
